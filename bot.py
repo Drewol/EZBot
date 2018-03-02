@@ -11,6 +11,9 @@ from datetime import datetime, timedelta
 
 client = discord.Client()
 EZAPI = "https://easyallies.com/api/site/getHome"
+EZLinks = {"Twitch" : "[Twitch](https://www.twitch.tv/easyallies)", 
+           "Youtube" : "[YouTube](https://www.youtube.com/channel/UCZrxXp1reP8E353rZsB3jaA)",
+					 "Patreon" : "[Patreon](https://www.patreon.com/EasyAllies)"}
 
 @client.event
 async def on_ready():
@@ -36,9 +39,9 @@ async def on_message(message):
 			time = datetime.strptime(event["date"], '%Y-%m-%dT%H:%M:%S.%fZ')
 			timeTo = time - datetime.utcnow()
 			if timeTo.days == 0:
-				upcoming += "**{}**: {}h {}min. \n".format(event["title"], math.floor(timeTo.seconds / 3600), math.floor((timeTo.seconds / 60) % 60))
+				upcoming += "**{}**: {}h {}min. {}\n".format(event["title"], math.floor(timeTo.seconds / 3600), math.floor((timeTo.seconds / 60) % 60), EZLinks[event["service"]])
 			elif timeTo.days < 3 and timeTo.days > 0:
-				upcoming += "**{}**: {} day(s) {}h {}min. \n".format(event["title"], timeTo.days, math.floor(timeTo.seconds / 3600), math.floor((timeTo.seconds / 60) % 60))
+				upcoming += "**{}**: {} day(s) {}h {}min. {}\n".format(event["title"], timeTo.days, math.floor(timeTo.seconds / 3600), math.floor((timeTo.seconds / 60) % 60), EZLinks[event["service"]])
 
 		em = discord.Embed(title='Upcoming events.', color=0xbe0121, description = upcoming)
 		await client.edit_message(tmp, "Schedule loaded.", embed=em)
