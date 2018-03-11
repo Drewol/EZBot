@@ -7,10 +7,12 @@ import urllib
 import urllib.request
 import math
 import pytz
+import pytz_dict
 
 from datetime import datetime, timedelta
 from pytz import timezone
 
+pytz_tz = pytz_dict.get_dict()
 client = discord.Client()
 EZAPI = "https://easyallies.com/api/site/getHome"
 EZLinks = {"Twitch" : "[Twitch](https://www.twitch.tv/easyallies)", 
@@ -49,7 +51,9 @@ async def cmd_schedule(message, tz = None, *args):
 				upcoming += "**{}**: {} day(s) {}h {}min. {}\n".format(event["title"], timeTo.days, math.floor(timeTo.seconds / 3600), math.floor((timeTo.seconds / 60) % 60), EZLinks[event["service"]])
 		else:
 			try:
-				set_tz = timezone(tz)
+				set_tz = pytz_tz.get(tz.upper(), None)
+				if set_tz is None:
+					set_tz = timezone(tz)
 			except:
 				await client.edit_message(tmp, "Unknown timezone.")
 				return
@@ -61,7 +65,11 @@ async def cmd_schedule(message, tz = None, *args):
 	em = discord.Embed(title='Upcoming events.', color=0xbe0121, description = upcoming)
 	await client.edit_message(tmp, "Schedule loaded.", embed=em)
 
-COMMANDS = {"SCHEDULE" : cmd_schedule}
+async def cmd_update(message, *args):
+	pytz_tz = pytz_dict.get_dict()
+	await client.send_message(message.channel, 'Internal data updated.')
+	
+COMMANDS = {"SCHEDULE" : cmd_schedule, "UPDATE" : cmd_update}
 
 @client.event
 async def on_message(message):
