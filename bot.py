@@ -44,11 +44,12 @@ async def cmd_schedule(message, tz = None, *args):
 	for event in decoded:
 		time = datetime.strptime(event["date"], '%Y-%m-%dT%H:%M:%S.%fZ')
 		timeTo = time - datetime.utcnow()
+		serviceStr = EZLinks.get(event["service"], "")
 		if tz is None:
 			if timeTo.days == 0:
-				upcoming += "**{}**: {}h {}min. {}\n".format(event["title"], math.floor(timeTo.seconds / 3600), math.floor((timeTo.seconds / 60) % 60), EZLinks[event["service"]])
+				upcoming += "**{}**: {}h {}min. {}\n".format(event["title"], math.floor(timeTo.seconds / 3600), math.floor((timeTo.seconds / 60) % 60), serviceStr)
 			elif timeTo.days < 3 and timeTo.days > 0:
-				upcoming += "**{}**: {} day(s) {}h {}min. {}\n".format(event["title"], timeTo.days, math.floor(timeTo.seconds / 3600), math.floor((timeTo.seconds / 60) % 60), EZLinks[event["service"]])
+				upcoming += "**{}**: {} day(s) {}h {}min. {}\n".format(event["title"], timeTo.days, math.floor(timeTo.seconds / 3600), math.floor((timeTo.seconds / 60) % 60), serviceStr)
 		else:
 			try:
 				set_tz = pytz_tz.get(tz.upper(), None)
@@ -60,7 +61,7 @@ async def cmd_schedule(message, tz = None, *args):
 			time = time.replace(tzinfo=pytz.utc)
 			time = time.astimezone(set_tz)
 			if timeTo.days < 2 and timeTo.days >= 0:
-				upcoming += "**{}**: {} {}\n".format(event["title"], time.strftime(TZFMT) , EZLinks[event["service"]])
+				upcoming += "**{}**: {} {}\n".format(event["title"], time.strftime(TZFMT) , serviceStr)
 
 	em = discord.Embed(title='Upcoming events.', color=0xbe0121, description = upcoming)
 	await client.edit_message(tmp, "Schedule loaded.", embed=em)
